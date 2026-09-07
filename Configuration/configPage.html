@@ -1,0 +1,559 @@
+<div id="StrmToolConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+    <style>
+        #StrmToolConfigPage {
+            /* Sourced from Jellyfin's own active theme (--jf-palette-* is set by jellyfin-web's
+               MUI theming per the theme chosen in Settings > Display); the values after each
+               comma are fallbacks for older servers that don't expose these variables. */
+            --st-bg: var(--jf-palette-background-default, #10191c);
+            --st-surface: var(--jf-palette-background-paper, #16252a);
+            --st-text: var(--jf-palette-text-primary, #eaf4f5);
+            --st-text-muted: var(--jf-palette-text-secondary, #9cc0c4);
+            --st-text-faint: color-mix(in srgb, var(--st-text-muted) 65%, transparent);
+            --st-border: var(--jf-palette-divider, #24393f);
+            --st-border-soft: color-mix(in srgb, var(--st-border) 70%, transparent);
+            --st-surface-alt: color-mix(in srgb, var(--st-surface) 88%, var(--st-text) 12%);
+            --st-row: color-mix(in srgb, var(--st-surface) 94%, var(--st-text) 6%);
+            --st-accent: var(--jf-palette-primary-main, #35c9c1);
+            --st-accent-strong: var(--jf-palette-primary-light, color-mix(in srgb, var(--st-accent) 80%, white));
+            --st-accent-soft: color-mix(in srgb, var(--st-accent) 20%, var(--st-surface));
+            --st-accent-contrast: var(--jf-palette-primary-contrastText, #062421);
+            --st-danger: var(--jf-palette-error-main, #e88ba8);
+            --st-radius-lg: 18px;
+            --st-radius-md: 13px;
+            --st-radius-sm: 9px;
+            --st-radius-pill: 999px;
+            --st-shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 34px rgba(0,0,0,.45);
+            font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+        }
+        #StrmToolConfigPage .st-shell * { box-sizing: border-box; }
+        #StrmToolConfigPage .st-shell {
+            display: grid;
+            grid-template-columns: 224px minmax(0,1fr);
+            background: var(--st-bg);
+            color: var(--st-text);
+            border-radius: var(--st-radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--st-border-soft);
+            min-height: 560px;
+        }
+        #StrmToolConfigPage .st-shell form { display: contents; }
+        #StrmToolConfigPage h1, #StrmToolConfigPage h2 { font-family: inherit; margin: 0; color: var(--st-text); }
+        #StrmToolConfigPage .mono { font-family: "Consolas","SFMono-Regular",ui-monospace,monospace; }
+
+        /* ---- Rail ---- */
+        #StrmToolConfigPage .st-rail { background: var(--st-surface); border-right: 1px solid var(--st-border-soft); padding: 16px 12px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+        #StrmToolConfigPage .st-brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 2px; }
+        #StrmToolConfigPage .st-brand-mark { width: 30px; height: 30px; border-radius: 10px; background: linear-gradient(155deg, var(--st-accent), var(--st-accent-strong)); color: var(--st-accent-contrast); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        #StrmToolConfigPage .st-brand-mark svg { width: 17px; height: 17px; }
+        #StrmToolConfigPage .st-brand-name { font-weight: 700; font-size: 16px; color: var(--st-accent-strong); }
+        #StrmToolConfigPage .st-brand-sub { font-size: 10.5px; color: var(--st-text-faint); font-weight: 600; }
+        #StrmToolConfigPage .st-nav-label { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--st-text-faint); padding: 2px 10px 4px; }
+        #StrmToolConfigPage .st-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+        #StrmToolConfigPage .st-nav-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px 11px; border: 0; border-radius: var(--st-radius-pill); background: var(--st-row); color: var(--st-text-muted); text-align: left; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+        #StrmToolConfigPage .st-nav-item:hover { background: var(--st-surface-alt); color: var(--st-text); }
+        #StrmToolConfigPage .st-nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+        #StrmToolConfigPage .st-nav-item .lbl { flex: 1; }
+        #StrmToolConfigPage .st-nav-item.active { background: var(--st-accent); color: var(--st-accent-contrast); }
+        #StrmToolConfigPage .st-rail-footer { margin-top: auto; border-top: 1px solid var(--st-border-soft); padding-top: 10px; display: flex; flex-direction: column; gap: 3px; }
+        #StrmToolConfigPage .st-rail-footer-row { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--st-text-faint); font-weight: 600; padding: 0 4px; }
+
+        /* ---- Main ---- */
+        #StrmToolConfigPage .st-main { min-width: 0; display: flex; flex-direction: column; max-height: 82vh; overflow-y: auto; }
+        #StrmToolConfigPage .st-topbar { display: flex; align-items: center; gap: 14px; padding: 16px 24px 0; }
+        #StrmToolConfigPage .st-topbar-title h1 { font-size: 19px; font-weight: 700; }
+        #StrmToolConfigPage .st-topbar-title p { margin: 2px 0 0; font-size: 11.5px; color: var(--st-text-muted); }
+        #StrmToolConfigPage .st-topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+        #StrmToolConfigPage .st-switch { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+        #StrmToolConfigPage .st-switch input { position: absolute; opacity: 0; width: 36px; height: 20px; margin: 0; cursor: pointer; }
+        #StrmToolConfigPage .st-switch .track { width: 36px; height: 20px; border-radius: var(--st-radius-pill); background: var(--st-row); border: 1px solid var(--st-border); position: relative; flex-shrink: 0; transition: background .12s; }
+        #StrmToolConfigPage .st-switch .track::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:var(--st-text-faint); transition: transform .12s, background .12s; }
+        #StrmToolConfigPage .st-switch input:checked + .track { background: var(--st-accent); border-color: var(--st-accent); }
+        #StrmToolConfigPage .st-switch input:checked + .track::after { transform: translateX(16px); background: #fff; }
+        #StrmToolConfigPage .st-switch .lbl { font-size: 12px; font-weight: 700; }
+
+        #StrmToolConfigPage .st-btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--st-radius-pill); border: 1.5px solid var(--st-border); background: var(--st-surface); color: var(--st-text); padding: 7px 15px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        #StrmToolConfigPage .st-btn:hover { border-color: var(--st-accent); color: var(--st-accent-strong); }
+        #StrmToolConfigPage .st-btn.primary { background: var(--st-accent); border-color: var(--st-accent); color: var(--st-accent-contrast); }
+        #StrmToolConfigPage .st-btn.primary:hover { background: var(--st-accent-strong); border-color: var(--st-accent-strong); }
+        #StrmToolConfigPage .st-btn svg { width: 13px; height: 13px; }
+
+        #StrmToolConfigPage .st-pagewrap { padding: 18px 24px 40px; }
+        #StrmToolConfigPage .st-page { display: none; }
+
+        #StrmToolConfigPage .st-card { background: var(--st-surface); border: 1px solid var(--st-border-soft); border-radius: var(--st-radius-lg); box-shadow: var(--st-shadow); padding: 16px 18px; margin-bottom: 14px; }
+        #StrmToolConfigPage .st-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        #StrmToolConfigPage .st-card-head h2 { font-size: 13px; font-weight: 700; }
+        #StrmToolConfigPage .st-card-head .hint { font-size: 11px; color: var(--st-text-faint); font-weight: 600; }
+        #StrmToolConfigPage .st-field-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--st-border-soft); }
+        #StrmToolConfigPage .st-field-row:first-child { border-top: 0; padding-top: 0; }
+        #StrmToolConfigPage .st-field-copy { max-width: 460px; }
+        #StrmToolConfigPage .st-field-copy .lbl { font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 2px; }
+        #StrmToolConfigPage .st-field-copy .hint { font-size: 11px; color: var(--st-text-faint); font-weight: 500; }
+
+        #StrmToolConfigPage .st-slider-field { display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+        #StrmToolConfigPage .st-slider-head { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600; }
+        #StrmToolConfigPage .st-slider-head .val { color: var(--st-accent-strong); font-weight: 700; cursor: pointer; border-bottom: 1px dashed transparent; }
+        #StrmToolConfigPage .st-slider-head .val:hover { border-bottom-color: var(--st-accent); }
+        #StrmToolConfigPage .st-val-edit { width: 60px; background: var(--st-row); border: 1px solid var(--st-accent); border-radius: 5px; color: var(--st-accent-strong); font: inherit; font-family: inherit; padding: 0 4px; text-align: right; -moz-appearance: textfield; appearance: textfield; }
+        #StrmToolConfigPage .st-slider-field input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 3px; background: var(--st-row); border: 1px solid var(--st-border-soft); }
+        #StrmToolConfigPage .st-slider-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--st-accent); border: 2.5px solid var(--st-surface); box-shadow: 0 0 0 1px var(--st-accent); margin-top: -6px; cursor: pointer; }
+        #StrmToolConfigPage .st-slider-field input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--st-accent); border: 2.5px solid var(--st-surface); box-shadow: 0 0 0 1px var(--st-accent); cursor: pointer; }
+
+        #StrmToolConfigPage .st-toast { position: fixed; bottom: 18px; right: 18px; background: var(--st-accent); color: var(--st-accent-contrast); padding: 10px 16px; border-radius: var(--st-radius-md); font-size: 12.5px; font-weight: 700; box-shadow: var(--st-shadow); opacity: 0; transform: translateY(8px); transition: opacity .15s, transform .15s; pointer-events: none; z-index: 50; }
+        #StrmToolConfigPage .st-toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 760px) {
+            #StrmToolConfigPage .st-shell { grid-template-columns: 1fr; }
+            #StrmToolConfigPage .st-rail { flex-direction: row; overflow-x: auto; }
+            #StrmToolConfigPage .st-rail-footer { display: none; }
+        }
+    </style>
+    <div data-role="content">
+        <div class="content-primary">
+            <div class="st-shell">
+                <form id="StrmToolConfigForm">
+                    <!-- ================= RAIL ================= -->
+                    <nav class="st-rail">
+                        <div class="st-brand">
+                            <div class="st-brand-mark">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8l6 4-6 4z"></path><rect x="3" y="4" width="18" height="16" rx="2.5"></rect></svg>
+                            </div>
+                            <div>
+                                <div class="st-brand-name">StrmTool</div>
+                                <div class="st-brand-sub" id="RailSub">Media Info Extractor</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="st-nav-label" id="RailNavLabel">Settings</div>
+                            <ul class="st-nav-list" id="RailNav"></ul>
+                        </div>
+
+                        <div class="st-rail-footer">
+                            <div class="st-rail-footer-row"><span>Version</span><span class="mono">2.4.0</span></div>
+                        </div>
+                    </nav>
+
+                    <!-- ================= MAIN ================= -->
+                    <div class="st-main">
+                        <div class="st-topbar">
+                            <div class="st-topbar-title">
+                                <h1 id="pageTitle">Strm Tool Settings</h1>
+                                <p id="StPageSub"></p>
+                            </div>
+                            <div class="st-topbar-actions">
+                                <button type="button" id="btnSave" class="st-btn primary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                                    <span id="lblBtnSave">Save</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="st-pagewrap">
+                            <!-- ===== General ===== -->
+                            <section class="st-page" id="SectionGeneral">
+                                <div class="st-card">
+                                    <div class="st-card-head"><h2>Auto extraction</h2></div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblEnableAutoExtract">Automatically extract media info for new strm files</span>
+                                            <div class="hint" id="descEnableAutoExtract">When enabled, new strm files will automatically extract media info in the background without manual task execution</div>
+                                        </div>
+                                        <label class="st-switch"><input type="checkbox" id="chkEnableAutoExtract" /><span class="track"></span></label>
+                                    </div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblRefreshDelay">Refresh delay (ms)</span>
+                                            <div class="hint" id="descRefreshDelay">Milliseconds to wait after each media info refresh to avoid overwhelming remote servers</div>
+                                        </div>
+                                        <div class="st-slider-field">
+                                            <div class="st-slider-head"><span>&nbsp;</span><span class="val" id="txtRefreshDelay_val">1000ms</span></div>
+                                            <input id="txtRefreshDelay" type="range" min="0" max="10000" step="100" data-unit="ms" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ===== Cache ===== -->
+                            <section class="st-page" id="SectionCache" style="display:none;">
+                                <div class="st-card">
+                                    <div class="st-card-head"><h2>Media info cache</h2></div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblEnableMediaInfoCache">Enable media info caching</span>
+                                            <div class="hint" id="descEnableMediaInfoCache">When enabled, extracted media info will be saved to xxx.strmtool.json files to avoid repeated probing</div>
+                                        </div>
+                                        <label class="st-switch"><input type="checkbox" id="chkEnableMediaInfoCache" /><span class="track"></span></label>
+                                    </div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblMetadataRestoreTimeout">Metadata restore timeout (minutes)</span>
+                                            <div class="hint" id="descMetadataRestoreTimeout">Maximum time to wait for metadata restoration when strm file size is reset (1-30 minutes)</div>
+                                        </div>
+                                        <div class="st-slider-field">
+                                            <div class="st-slider-head"><span>&nbsp;</span><span class="val" id="txtMetadataRestoreTimeout_val">5m</span></div>
+                                            <input id="txtMetadataRestoreTimeout" type="range" min="1" max="30" step="1" data-unit="m" />
+                                        </div>
+                                    </div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblImportExistingCacheWhenMissing">Import existing cache when data missing from Jellyfin</span>
+                                            <div class="hint" id="descImportExistingCacheWhenMissing">When enabled, if a cache file exists for a strm file but Jellyfin has no media info for it, the cached size, runtime and container are imported into Jellyfin's database to match the cache</div>
+                                        </div>
+                                        <label class="st-switch"><input type="checkbox" id="chkImportExistingCacheWhenMissing" /><span class="track"></span></label>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ===== Concurrency ===== -->
+                            <section class="st-page" id="SectionConcurrency" style="display:none;">
+                                <div class="st-card">
+                                    <div class="st-card-head"><h2>Extraction throughput</h2></div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblMaxConcurrentExtract">Maximum concurrent extractions (restart required)</span>
+                                            <div class="hint" id="descMaxConcurrentExtract">Maximum number of concurrent media info extraction tasks</div>
+                                        </div>
+                                        <div class="st-slider-field">
+                                            <div class="st-slider-head"><span>&nbsp;</span><span class="val" id="txtMaxConcurrentExtract_val">5</span></div>
+                                            <input id="txtMaxConcurrentExtract" type="range" min="1" max="50" step="1" data-unit="" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ===== Force refresh ===== -->
+                            <section class="st-page" id="SectionForceRefresh" style="display:none;">
+                                <div class="st-card">
+                                    <div class="st-card-head"><h2 id="lblForceRefresh">Force Refresh Options</h2></div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblForceRefreshIgnoreExisting">Ignore existing media streams</span>
+                                            <div class="hint" id="descForceRefreshIgnoreExisting">When enabled, will always execute refresh regardless of whether media stream info already exists (cache can still be used)</div>
+                                        </div>
+                                        <label class="st-switch"><input type="checkbox" id="chkForceRefreshIgnoreExisting" /><span class="track"></span></label>
+                                    </div>
+                                    <div class="st-field-row">
+                                        <div class="st-field-copy">
+                                            <span class="lbl" id="lblForceRefreshIgnoreCache">Ignore cache</span>
+                                            <div class="hint" id="descForceRefreshIgnoreCache">When enabled, will always fetch from remote server directly, ignoring cache files (will still check if media streams exist)</div>
+                                        </div>
+                                        <label class="st-switch"><input type="checkbox" id="chkForceRefreshIgnoreCache" /><span class="track"></span></label>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="st-toast" id="StToast"></div>
+
+    <script>
+        // ============================================================
+        // Important: these translation resources must stay in sync with the
+        // backend Resources/ directory's .json files (en.json, zh-CN.json)!
+        // ============================================================
+        // Translation resources (same format as the backend)
+        const translations = {
+            'en': {
+                'StrmTool.PageTitle': 'Strm Tool Settings',
+                'StrmTool.LblEnableAutoExtract': 'Automatically extract media info for new strm files',
+                'StrmTool.DescEnableAutoExtract': 'When enabled, new strm files will automatically extract media info in the background without manual task execution',
+                'StrmTool.LblEnableMediaInfoCache': 'Enable media info caching',
+                'StrmTool.DescEnableMediaInfoCache': 'When enabled, extracted media info will be saved to xxx.strmtool.json files to avoid repeated probing',
+                'StrmTool.LblRefreshDelay': 'Refresh delay (ms)',
+                'StrmTool.DescRefreshDelay': 'Milliseconds to wait after each media info refresh to avoid overwhelming remote servers',
+                'StrmTool.LblMaxConcurrentExtract': 'Maximum concurrent extractions (restart required)',
+                'StrmTool.DescMaxConcurrentExtract': 'Maximum number of concurrent media info extraction tasks',
+                'StrmTool.LblForceRefresh': 'Force Refresh Options',
+                'StrmTool.LblForceRefreshIgnoreExisting': 'Ignore existing media streams',
+                'StrmTool.DescForceRefreshIgnoreExisting': 'When enabled, will always execute refresh regardless of whether media stream info already exists (cache can still be used)',
+                'StrmTool.LblForceRefreshIgnoreCache': 'Ignore cache',
+                'StrmTool.DescForceRefreshIgnoreCache': 'When enabled, will always fetch from remote server directly, ignoring cache files (will still check if media streams exist)',
+                'StrmTool.LblMetadataRestoreTimeout': 'Metadata restore timeout (minutes)',
+                'StrmTool.DescMetadataRestoreTimeout': 'Maximum time to wait for metadata restoration when strm file size is reset (1-30 minutes)',
+                'StrmTool.LblImportExistingCacheWhenMissing': 'Import existing cache when data missing from Jellyfin',
+                'StrmTool.DescImportExistingCacheWhenMissing': "When enabled, if a cache file exists for a strm file but Jellyfin has no media info for it, the cached size, runtime and container are imported into Jellyfin's database to match the cache",
+                'StrmTool.BtnSave': 'Save',
+                'StrmTool.SettingsSaved': 'Settings saved successfully'
+            },
+            'zh': {
+                'StrmTool.PageTitle': 'Strm工具设置',
+                'StrmTool.LblEnableAutoExtract': '自动提取新入库 strm 文件的媒体信息',
+                'StrmTool.DescEnableAutoExtract': '启用后，新增的 strm 文件会自动在后台执行媒体信息提取，无需手动运行计划任务',
+                'StrmTool.LblEnableMediaInfoCache': '启用媒体信息缓存',
+                'StrmTool.DescEnableMediaInfoCache': '启用后，提取的媒体信息会保存到 xxx.strmtool.json 文件中，避免重复探测',
+                'StrmTool.LblRefreshDelay': '刷新延迟 (毫秒)',
+                'StrmTool.DescRefreshDelay': '每次刷新媒体信息后等待的毫秒数，用于避免对远程服务器造成压力',
+                'StrmTool.LblMaxConcurrentExtract': '最大并发提取数（需重启生效）',
+                'StrmTool.DescMaxConcurrentExtract': '媒体信息提取任务的最大并发数',
+                'StrmTool.LblForceRefresh': '强制刷新选项',
+                'StrmTool.LblForceRefreshIgnoreExisting': '无视是否已有媒体流',
+                'StrmTool.DescForceRefreshIgnoreExisting': '启用后，无论是否已存在媒体信息都会执行刷新（仍可利用缓存）',
+                'StrmTool.LblForceRefreshIgnoreCache': '无视缓存',
+                'StrmTool.DescForceRefreshIgnoreCache': '启用后，直接从远程服务器获取信息，忽略缓存文件（仍会判断是否已有媒体信息）',
+                'StrmTool.LblMetadataRestoreTimeout': '元数据恢复超时（分钟）',
+                'StrmTool.DescMetadataRestoreTimeout': '当 strm 文件大小被重置时，等待元数据恢复的最大时间（1-30分钟）',
+                'StrmTool.LblImportExistingCacheWhenMissing': '在 Jellyfin 缺失数据时导入现有缓存',
+                'StrmTool.DescImportExistingCacheWhenMissing': '启用后，如果某个 strm 文件存在缓存文件但 Jellyfin 中没有其媒体信息，会将缓存中的大小、时长和容器信息导入 Jellyfin 数据库，使其与缓存保持一致',
+                'StrmTool.BtnSave': '保存',
+                'StrmTool.SettingsSaved': '设置已保存'
+            }
+        };
+
+        // ===== Section (rail) definitions =====
+        var SECTIONS = [
+            { id: 'General', label: 'General', sub: 'Automatic extraction for newly added strm files.',
+              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8l6 4-6 4z"></path><rect x="3" y="4" width="18" height="16" rx="2.5"></rect></svg>' },
+            { id: 'Cache', label: 'Cache', sub: 'Media info caching and metadata restore behavior.',
+              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path></svg>' },
+            { id: 'Concurrency', label: 'Concurrency', sub: 'How many strm files are probed at the same time.',
+              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h13"/><circle cx="15" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="7" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="2" fill="currentColor" stroke="none"/></svg>' },
+            { id: 'ForceRefresh', label: 'Force Refresh', sub: 'Overrides for re-probing already extracted files.',
+              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg>' }
+        ];
+        var activeSection = 'General';
+
+        function q(id) { return document.getElementById(id); }
+
+        function renderRail() {
+            var rail = q('RailNav');
+            rail.innerHTML = SECTIONS.map(function(s) {
+                var active = s.id === activeSection ? ' active' : '';
+                return '<li><button type="button" class="st-nav-item' + active + '" data-section="' + s.id + '">' + s.icon +
+                    '<span class="lbl">' + s.label + '</span></button></li>';
+            }).join('');
+            rail.querySelectorAll('.st-nav-item').forEach(function(btn) {
+                btn.addEventListener('click', function() { activeSection = btn.getAttribute('data-section'); renderRail(); showActiveSection(); });
+            });
+        }
+
+        function showActiveSection() {
+            SECTIONS.forEach(function(s) {
+                var el = q('Section' + s.id);
+                if (el) el.style.display = s.id === activeSection ? 'block' : 'none';
+            });
+            var current = SECTIONS.find(function(s) { return s.id === activeSection; });
+            if (current) q('StPageSub').textContent = current.sub;
+        }
+
+        // ===== Get the current language =====
+        function getCurrentCulture() {
+            try {
+                // Try a few possible sources for the language setting:
+                // 1. From the Jellyfin config
+                // 2. From page elements or attributes
+                // 3. From the system language setting
+
+                // Try dashboardCulture (a variable Jellyfin may use)
+                if (typeof window.dashboardCulture !== 'undefined' && window.dashboardCulture) {
+                    return window.dashboardCulture;
+                }
+
+                // Try Culture (a variable Jellyfin may use)
+                if (typeof window.Culture !== 'undefined' && window.Culture) {
+                    return window.Culture;
+                }
+
+                // Try localStorage or other storage
+                if (typeof localStorage !== 'undefined') {
+                    const storedCulture = localStorage.getItem('jellyfin-culture') ||
+                                           localStorage.getItem('culture') ||
+                                           localStorage.getItem('ui-culture');
+                    if (storedCulture) {
+                        return storedCulture;
+                    }
+                }
+
+                // Try the HTML tag's language setting
+                const htmlLang = document.documentElement.getAttribute('lang');
+                if (htmlLang) {
+                    return htmlLang;
+                }
+
+                // Finally, fall back to the browser's language setting
+                const browserLang = navigator.language || navigator.userLanguage || 'en';
+                return browserLang;
+
+            } catch (e) {
+                console.error('Failed to get language setting:', e);
+                return 'en'; // Default to English, matching the backend
+            }
+        }
+
+        // Translation function (same format as the backend)
+        function t(key) {
+            const culture = getCurrentCulture();
+            const langCode = culture.split('-')[0];
+
+            // Try the full culture code
+            if (translations[culture] && translations[culture][key]) {
+                return translations[culture][key];
+            }
+
+            // Try the language prefix
+            if (translations[langCode] && translations[langCode][key]) {
+                return translations[langCode][key];
+            }
+
+            // Fall back to English
+            return translations['en'][key] || key;
+        }
+
+        // Apply translations
+        function applyTranslations() {
+            document.getElementById('pageTitle').textContent = t('StrmTool.PageTitle');
+            document.getElementById('lblEnableAutoExtract').textContent = t('StrmTool.LblEnableAutoExtract');
+            document.getElementById('descEnableAutoExtract').textContent = t('StrmTool.DescEnableAutoExtract');
+            document.getElementById('lblEnableMediaInfoCache').textContent = t('StrmTool.LblEnableMediaInfoCache');
+            document.getElementById('descEnableMediaInfoCache').textContent = t('StrmTool.DescEnableMediaInfoCache');
+            document.getElementById('lblRefreshDelay').textContent = t('StrmTool.LblRefreshDelay');
+            document.getElementById('descRefreshDelay').textContent = t('StrmTool.DescRefreshDelay');
+            document.getElementById('lblMaxConcurrentExtract').textContent = t('StrmTool.LblMaxConcurrentExtract');
+            document.getElementById('descMaxConcurrentExtract').textContent = t('StrmTool.DescMaxConcurrentExtract');
+            document.getElementById('lblForceRefresh').textContent = t('StrmTool.LblForceRefresh');
+            document.getElementById('lblForceRefreshIgnoreExisting').textContent = t('StrmTool.LblForceRefreshIgnoreExisting');
+            document.getElementById('descForceRefreshIgnoreExisting').textContent = t('StrmTool.DescForceRefreshIgnoreExisting');
+            document.getElementById('lblForceRefreshIgnoreCache').textContent = t('StrmTool.LblForceRefreshIgnoreCache');
+            document.getElementById('descForceRefreshIgnoreCache').textContent = t('StrmTool.DescForceRefreshIgnoreCache');
+            document.getElementById('lblMetadataRestoreTimeout').textContent = t('StrmTool.LblMetadataRestoreTimeout');
+            document.getElementById('descMetadataRestoreTimeout').textContent = t('StrmTool.DescMetadataRestoreTimeout');
+            document.getElementById('lblImportExistingCacheWhenMissing').textContent = t('StrmTool.LblImportExistingCacheWhenMissing');
+            document.getElementById('descImportExistingCacheWhenMissing').textContent = t('StrmTool.DescImportExistingCacheWhenMissing');
+            document.getElementById('lblBtnSave').textContent = t('StrmTool.BtnSave');
+        }
+
+        // ===== Slider <-> value label sync =====
+        function syncSliderLabels(root) {
+            (root || document).querySelectorAll('input[type="range"]').forEach(function(r) {
+                var out = document.getElementById(r.id + '_val');
+                if (out && !out.querySelector('input')) out.textContent = r.value + (r.dataset.unit || '');
+            });
+        }
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('input[type="range"]')) {
+                var out = document.getElementById(e.target.id + '_val');
+                if (out && !out.querySelector('input')) out.textContent = e.target.value + (e.target.dataset.unit || '');
+            }
+        });
+        // Click a slider's value to type an exact number instead of dragging
+        document.addEventListener('click', function(e) {
+            var valSpan = e.target.closest('.st-slider-head .val');
+            if (valSpan && !valSpan.querySelector('input')) beginValueEdit(valSpan);
+        });
+        function beginValueEdit(valSpan) {
+            var range = document.getElementById(valSpan.id.replace(/_val$/, ''));
+            if (!range) return;
+            var unit = range.dataset.unit || '';
+            var editor = document.createElement('input');
+            editor.type = 'number';
+            editor.className = 'st-val-edit';
+            editor.value = range.value;
+            if (range.min !== '') editor.min = range.min;
+            if (range.max !== '') editor.max = range.max;
+            editor.step = range.step || 1;
+            valSpan.textContent = '';
+            valSpan.appendChild(editor);
+            editor.focus();
+            editor.select();
+
+            var committed = false;
+            function commit() {
+                if (committed) return;
+                committed = true;
+                var v = parseFloat(editor.value);
+                if (isNaN(v)) v = parseFloat(range.value);
+                if (range.min !== '') v = Math.max(parseFloat(range.min), v);
+                if (range.max !== '') v = Math.min(parseFloat(range.max), v);
+                range.value = v;
+                valSpan.textContent = range.value + unit;
+                range.dispatchEvent(new Event('input', { bubbles: true }));
+                range.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            function cancel() {
+                if (committed) return;
+                committed = true;
+                valSpan.textContent = range.value + unit;
+            }
+            editor.addEventListener('blur', commit);
+            editor.addEventListener('keydown', function(ev) {
+                if (ev.key === 'Enter') { ev.preventDefault(); editor.blur(); }
+                else if (ev.key === 'Escape') { ev.preventDefault(); editor.removeEventListener('blur', commit); cancel(); }
+            });
+            editor.addEventListener('click', function(ev) { ev.stopPropagation(); });
+        }
+
+        function showToast(message) {
+            var toast = q('StToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(function() { toast.classList.remove('show'); }, 2600);
+        }
+
+        function loadConfig() {
+            ApiClient.getPluginConfiguration('6107fc8c-883a-4171-b70e-7590658706B9').then(function(config) {
+                document.getElementById('chkEnableAutoExtract').checked = config.EnableAutoExtract !== false;
+                document.getElementById('chkEnableMediaInfoCache').checked = config.EnableMediaInfoCache !== false;
+                document.getElementById('txtRefreshDelay').value = config.RefreshDelayMs ?? 1000;
+                document.getElementById('txtMaxConcurrentExtract').value = config.MaxConcurrentExtract ?? 5;
+                document.getElementById('chkForceRefreshIgnoreExisting').checked = config.ForceRefreshIgnoreExisting === true;
+                document.getElementById('chkForceRefreshIgnoreCache').checked = config.ForceRefreshIgnoreCache === true;
+                document.getElementById('txtMetadataRestoreTimeout').value = config.MetadataRestoreTimeoutMinutes ?? 5;
+                document.getElementById('chkImportExistingCacheWhenMissing').checked = config.ImportExistingCacheWhenMissing === true;
+                syncSliderLabels();
+            });
+        }
+
+        function saveConfig() {
+            const refreshDelayInput = parseInt(document.getElementById('txtRefreshDelay').value, 10);
+            const maxConcurrentInput = parseInt(document.getElementById('txtMaxConcurrentExtract').value, 10);
+            const metadataRestoreTimeoutInput = parseInt(document.getElementById('txtMetadataRestoreTimeout').value, 10);
+            var config = {
+                EnableAutoExtract: document.getElementById('chkEnableAutoExtract').checked,
+                EnableMediaInfoCache: document.getElementById('chkEnableMediaInfoCache').checked,
+                RefreshDelayMs: Number.isNaN(refreshDelayInput) ? 1000 : refreshDelayInput,
+                MaxConcurrentExtract: Number.isNaN(maxConcurrentInput) ? 5 : maxConcurrentInput,
+                ForceRefreshIgnoreExisting: document.getElementById('chkForceRefreshIgnoreExisting').checked,
+                ForceRefreshIgnoreCache: document.getElementById('chkForceRefreshIgnoreCache').checked,
+                MetadataRestoreTimeoutMinutes: Number.isNaN(metadataRestoreTimeoutInput) ? 5 : metadataRestoreTimeoutInput,
+                ImportExistingCacheWhenMissing: document.getElementById('chkImportExistingCacheWhenMissing').checked
+            };
+
+            ApiClient.updatePluginConfiguration('6107fc8c-883a-4171-b70e-7590658706B9', config).then(function() {
+                // Show a save-succeeded toast (plain text)
+                showToast(t('StrmTool.SettingsSaved'));
+            });
+        }
+
+        document.getElementById('btnSave').addEventListener('click', saveConfig);
+
+        // Apply translations and load the config once the page loads
+        function initializePage() {
+            console.log('Initializing settings page');
+            applyTranslations();
+            renderRail();
+            showActiveSection();
+            loadConfig();
+        }
+
+        // Wait for the page to load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            // The page has already finished loading
+            initializePage();
+        }
+
+        // Reload the config when page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadConfig();
+            }
+        });
+    </script>
+</div>
