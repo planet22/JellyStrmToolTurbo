@@ -48,6 +48,8 @@ namespace Jellyfin.Plugin.StrmToolTurbo
                 _logger.LogInformation("  MaxConcurrentExtract: {Value}", config.MaxConcurrentExtract);
                 _logger.LogInformation("  ForceRefreshIgnoreExisting: {Value}", config.ForceRefreshIgnoreExisting);
                 _logger.LogInformation("  ForceRefreshIgnoreCache: {Value}", config.ForceRefreshIgnoreCache);
+                _logger.LogInformation("  MetadataRestoreTimeoutMinutes: {Value}", config.MetadataRestoreTimeoutMinutes);
+                _logger.LogInformation("  ImportExistingCacheWhenMissing: {Value}", config.ImportExistingCacheWhenMissing);
             }
             catch (Exception ex)
             {

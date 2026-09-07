@@ -186,6 +186,14 @@ namespace Jellyfin.Plugin.StrmToolTurbo
         /// </summary>
         private async Task ImportItemMetadataFromCacheAsync(BaseItem item, MediaInfoCacheData cacheData, CancellationToken cancellationToken)
         {
+            if (cacheData.Size <= 0)
+            {
+                // A Size of 0 means this cache entry predates capturing Size/RunTimeTicks/Container
+                // (or the probe never got them); importing it would just clobber good data with zero.
+                _logger.LogDebug("{Name}: Cached Size is {Size}, skipping metadata import", item.Name, cacheData.Size);
+                return;
+            }
+
             try
             {
                 item.Size = cacheData.Size;
