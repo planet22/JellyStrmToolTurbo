@@ -5,7 +5,6 @@
     <RootNamespace>Jellyfin.Plugin.StrmToolTurbo</RootNamespace>
     <AssemblyName>Jellyfin.Plugin.StrmToolTurbo</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <AnalysisMode>AllDisabledByDefault</AnalysisMode>
