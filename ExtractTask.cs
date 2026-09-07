@@ -76,7 +76,7 @@ namespace Jellyfin.Plugin.StrmToolTurbo
             }
         }
 
-        public string Category => "StrmTool";
+        public string Category => "StrmToolTurbo";
         public string Key => "StrmToolTask";
         public string Description => Plugin.Instance?.GetLocalizedString("StrmTool.TaskDescription") ?? "Extract media technical information (codec, resolution, subtitles) from strm files";
         public string Name => Plugin.Instance?.GetLocalizedString("StrmTool.TaskName") ?? "Extract Strm Media Info";
@@ -386,7 +386,7 @@ namespace Jellyfin.Plugin.StrmToolTurbo
 
             var (beforeStreams, afterStreams) = await ProcessItemCoreAsync(
                 item, 
-                "StrmTool", 
+                "StrmToolTurbo",
                 cancellationToken).ConfigureAwait(false);
 
             bool hasVideo = afterStreams.Any(s => s.Type == MediaStreamType.Video);

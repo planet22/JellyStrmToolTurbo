@@ -44,7 +44,7 @@ Click the "Settings" button on the plugin details page to adjust the following c
 ### Scheduled Tasks
 
 1. Go to Jellyfin admin → Scheduled Tasks
-2. Find the `Extract Strm Media Info` task under the `Strm Tool` category
+2. Find the `Extract Strm Media Info` task under the `Strm Tool Turbo` category
 3. Can be run manually or set to trigger on a schedule
 4. This task can use the force refresh options on the settings page to control refresh and cache usage strategies - one task can handle extraction, backup, and recovery functions.
 
