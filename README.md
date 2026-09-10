@@ -16,7 +16,7 @@ Jellyfin plugin for extracting media technical information (codec, resolution, s
 4. **Scheduled Task Support**: Provides an `Extract Strm Media Info` scheduled task that supports manual triggering and scheduled execution
 5. **Configuration Interface**: Provides a plugin settings page to adjust automatic extraction toggle, refresh delay, persistent cache toggle, maximum concurrency, and force refresh strategies
 
-Compatible with Jellyfin 10.11.0+ (latest 10.11.6 tested, other versions please test yourself)
+Built against Jellyfin 12.0.0 (.NET 10). For Jellyfin 10.11.x servers, use a build targeting net9.0 with Jellyfin.Controller 10.11.6 instead.
 
 ## Installation
 
