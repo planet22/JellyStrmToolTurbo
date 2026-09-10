@@ -131,7 +131,7 @@
                         </div>
 
                         <div class="st-rail-footer">
-                            <div class="st-rail-footer-row"><span>Version</span><span class="mono">2.4.0</span></div>
+                            <div class="st-rail-footer-row"><span>Version</span><span class="mono" id="RailVersion">&hellip;</span></div>
                         </div>
                     </nav>
 
@@ -495,6 +495,15 @@
             showToast._t = setTimeout(function() { toast.classList.remove('show'); }, 2600);
         }
 
+        function loadVersion() {
+            ApiClient.getInstalledPlugins().then(function(plugins) {
+                var plugin = plugins.find(function(p) { return p.Id && p.Id.toLowerCase() === '6107fc8c-883a-4171-b70e-7590658706b9'; });
+                q('RailVersion').textContent = plugin && plugin.Version ? plugin.Version : '?';
+            }).catch(function() {
+                q('RailVersion').textContent = '?';
+            });
+        }
+
         function loadConfig() {
             ApiClient.getPluginConfiguration('6107fc8c-883a-4171-b70e-7590658706B9').then(function(config) {
                 document.getElementById('chkEnableAutoExtract').checked = config.EnableAutoExtract !== false;
@@ -539,6 +548,7 @@
             renderRail();
             showActiveSection();
             loadConfig();
+            loadVersion();
         }
 
         // Wait for the page to load
