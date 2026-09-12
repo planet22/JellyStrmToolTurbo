@@ -1,12 +1,19 @@
 This is a fork of https://github.com/jinlin-teck/StrmTool/tree/jellyfin
 
+## Differences from the original
+
+- Retargeted to Jellyfin 12.0 / .NET 10 by default (the original targets Jellyfin 10.11.6 / .NET 9), under its own plugin identity — namespace and assembly name renamed from `StrmTool` to `StrmToolTurbo` so it can be installed alongside the original.
+- Added a "Import existing cache when data missing from Jellyfin" option that restores a strm file's Size, RunTimeTicks, and Container from the cache into Jellyfin's database when that data is missing (skips cache entries with a Size of 0 so it never clobbers good data with zero).
+- Completely redesigned the plugin settings page as a themed, card-based UI that follows Jellyfin's active theme colors, replacing the original's plain checkbox list.
+- The config page's version display now reads the actual running assembly version instead of a hardcoded value, and tolerates different `getInstalledPlugins()` response shapes.
+- Fixed a path-traversal sanity check in the media info cache that compared paths against doubled backslashes (`..\\`) and so could never actually match a real path.
+- Ships its own Jellyfin plugin repository manifest for one-click catalog installs (see Installation below).
+
 # StrmToolTurbo for Jellyfin
 
 Jellyfin plugin for extracting media technical information (codec, resolution, subtitles) from strm files to accelerate playback startup speed.
 
-> **Recommended companion**: If you also need to batch-generate strm files from OpenList/Alist, check out my other project: [openlist-strm](https://github.com/jinlin-teck/openlist-strm) — a lightweight service with WebUI that generates .strm files from OpenList/Alist directories. Combined with this plugin, you can play strm media files perfectly on Jellyfin.
-
-🎉 **v2.2.0 Update**: New Size protection mechanism! Automatically restores from cache when metadata like Size of strm files is accidentally reset; also optimizes code structure and error handling.
+> **Recommended companion**: If you also need to batch-generate strm files from OpenList/Alist, check out the original author's project: [openlist-strm](https://github.com/jinlin-teck/openlist-strm) — a lightweight service with WebUI that generates .strm files from OpenList/Alist directories. Combined with this plugin, you can play strm media files perfectly on Jellyfin.
 
 ## Core Features
 
@@ -20,7 +27,19 @@ Built against Jellyfin 12.0.0 (.NET 10). For Jellyfin 10.11.x servers, use a bui
 
 ## Installation
 
-1. Create a new folder `StrmToolTurbo` in Jellyfin's `plugin` directory
+### Via plugin repository (recommended)
+
+1. In Jellyfin, go to **Dashboard → Plugins → Repositories**
+2. Add a new repository with this manifest URL:
+   ```
+   https://github.com/planet22/JellyStrmToolTurbo/raw/main/manifest.json
+   ```
+3. Go to **Dashboard → Plugins → Catalog**, find **StrmToolTurbo**, and install it
+4. Restart Jellyfin
+
+### Manual install
+
+1. Create a new folder `StrmToolTurbo` in Jellyfin's `plugins` directory
 2. Place the compiled `Jellyfin.Plugin.StrmToolTurbo.dll` into this folder
 3. Restart the Jellyfin service
 
@@ -50,6 +69,6 @@ Click the "Settings" button on the plugin details page to adjust the following c
 
 ## Notes
 
-- Please select the corresponding plugin version based on your Jellyfin version
-- Compared to previous versions, v1.0.0.3 does not call any third-party metadata services, and existing metadata (title, description, posters, etc.) will not be modified
+- The published release targets Jellyfin 12.0.0 (.NET 10). For Jellyfin 10.11.x servers, build from source targeting `net9.0` with `Jellyfin.Controller` 10.11.6 instead (see the original project's `.csproj` for reference).
+- This plugin does not call any third-party metadata services, and existing metadata (title, description, posters, etc.) will not be modified
 - Media info cache file format is `strm_filename.strmtool.json`, located in the same directory as the strm file
