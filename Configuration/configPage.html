@@ -496,10 +496,15 @@
         }
 
         function loadVersion() {
-            ApiClient.getInstalledPlugins().then(function(plugins) {
-                var plugin = plugins.find(function(p) { return p.Id && p.Id.toLowerCase() === '6107fc8c-883a-4171-b70e-7590658706b9'; });
+            ApiClient.getInstalledPlugins().then(function(resp) {
+                var plugins = Array.isArray(resp) ? resp : (resp && resp.Items) || [];
+                var wantId = '6107fc8c-883a-4171-b70e-7590658706b9'.replace(/-/g, '');
+                var plugin = plugins.find(function(p) { return p.Id && p.Id.toLowerCase().replace(/-/g, '') === wantId; });
+                if (!plugin) plugin = plugins.find(function(p) { return p.Name === 'StrmToolTurbo'; });
                 q('RailVersion').textContent = plugin && plugin.Version ? plugin.Version : '?';
-            }).catch(function() {
+                if (!plugin) console.warn('[StrmToolTurbo] Could not find plugin in getInstalledPlugins() response:', resp);
+            }).catch(function(err) {
+                console.error('[StrmToolTurbo] loadVersion error:', err);
                 q('RailVersion').textContent = '?';
             });
         }
