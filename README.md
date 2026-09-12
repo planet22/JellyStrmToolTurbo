@@ -7,7 +7,6 @@ This is a fork of https://github.com/jinlin-teck/StrmTool/tree/jellyfin
 - Completely redesigned the plugin settings page as a themed, card-based UI that follows Jellyfin's active theme colors, replacing the original's plain checkbox list.
 - The config page's version display now reads the actual running assembly version instead of a hardcoded value, and tolerates different `getInstalledPlugins()` response shapes.
 - Fixed a path-traversal sanity check in the media info cache that compared paths against doubled backslashes (`..\\`) and so could never actually match a real path.
-- Ships its own Jellyfin plugin repository manifest for one-click catalog installs (see Installation below).
 
 # StrmToolTurbo for Jellyfin
 
